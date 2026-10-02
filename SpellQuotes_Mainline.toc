@@ -1,0 +1,18 @@
+## Interface: 120100
+## Title: SpellQuotes (by run3_)
+## Notes: Random quotes when casting configured spells.
+## Author: run3_
+## Version: 0.1.0
+## SavedVariables: SpellQuotesDB
+
+Localization\enUS.lua
+Localization\deDE.lua
+
+Database.lua
+SpellWatcher.lua
+
+UI\MainFrame.lua
+UI\SpellList.lua
+UI\SpellEditor.lua
+
+Core.lua
