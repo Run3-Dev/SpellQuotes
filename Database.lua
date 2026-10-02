@@ -6,9 +6,13 @@ local Database = ns.Database
 
 local DEFAULTS = {
     enabled = true,
-
     spells = {},
 }
+
+
+-- -------------------------------------------------------
+-- Defaults
+-- -------------------------------------------------------
 
 local function CopyDefaults(source, target)
     for key, value in pairs(source) do
@@ -25,21 +29,45 @@ local function CopyDefaults(source, target)
     end
 end
 
+
+-- -------------------------------------------------------
+-- Initialization
+-- -------------------------------------------------------
+
 function Database:Initialize()
     SpellQuotesDB = SpellQuotesDB or {}
 
-    CopyDefaults(DEFAULTS, SpellQuotesDB)
+    CopyDefaults(
+        DEFAULTS,
+        SpellQuotesDB
+    )
 
     ns.db = SpellQuotesDB
 end
 
-function Database:GetSpell(spellID)
+
+-- -------------------------------------------------------
+-- Global settings
+-- -------------------------------------------------------
+
+function Database:IsEnabled()
+    return ns.db
+        and ns.db.enabled == true
+end
+
+
+function Database:SetEnabled(enabled)
     if not ns.db then
-        return nil
+        return
     end
 
-    return ns.db.spells[spellID]
+    ns.db.enabled = enabled == true
 end
+
+
+-- -------------------------------------------------------
+-- Spells
+-- -------------------------------------------------------
 
 function Database:GetSpells()
     if not ns.db then
@@ -49,7 +77,21 @@ function Database:GetSpells()
     return ns.db.spells
 end
 
-function Database:SaveSpell(spellID, chance, quotes)
+
+function Database:GetSpell(spellID)
+    if not ns.db then
+        return nil
+    end
+
+    return ns.db.spells[spellID]
+end
+
+
+function Database:SaveSpell(
+    spellID,
+    chance,
+    quotes
+)
     if not ns.db then
         return
     end
@@ -60,22 +102,11 @@ function Database:SaveSpell(spellID, chance, quotes)
     }
 end
 
+
 function Database:DeleteSpell(spellID)
     if not ns.db then
         return
     end
 
     ns.db.spells[spellID] = nil
-end
-
-function Database:SetEnabled(enabled)
-    if not ns.db then
-        return
-    end
-
-    ns.db.enabled = enabled
-end
-
-function Database:IsEnabled()
-    return ns.db and ns.db.enabled
 end

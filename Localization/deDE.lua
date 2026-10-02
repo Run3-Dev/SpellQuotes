@@ -29,3 +29,8 @@ L.DELETE_CONFIRM = "Diesen Spell löschen?"
 
 L.ENABLED = "Aktiviert"
 L.DISABLED = "Deaktiviert"
+
+L.QUOTE_COUNT = "Sprüche"
+L.UNKNOWN_SPELL = "Unbekannter Spell"
+
+L.COMMUNICATION_ERROR = "SpellQuotes-Nachricht konnte nicht gesendet werden."

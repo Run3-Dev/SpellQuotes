@@ -7,6 +7,7 @@ local MainFrame = ns.UI.MainFrame
 
 local frame
 
+
 function MainFrame:Create()
     if frame then
         return frame
@@ -14,7 +15,7 @@ function MainFrame:Create()
 
     frame = CreateFrame(
         "Frame",
-        nil,
+        "SpellQuotesMainFrame",
         UIParent,
         "BackdropTemplate"
     )
@@ -25,21 +26,33 @@ function MainFrame:Create()
     frame:SetMovable(true)
     frame:EnableMouse(true)
     frame:RegisterForDrag("LeftButton")
+    frame:SetClampedToScreen(true)
 
-    frame:SetScript("OnDragStart", function(self)
-        self:StartMoving()
-    end)
+    frame:SetScript(
+        "OnDragStart",
+        function(self)
+            self:StartMoving()
+        end
+    )
 
-    frame:SetScript("OnDragStop", function(self)
-        self:StopMovingOrSizing()
-    end)
+    frame:SetScript(
+        "OnDragStop",
+        function(self)
+            self:StopMovingOrSizing()
+        end
+    )
 
     frame:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        bgFile =
+            "Interface\\DialogFrame\\UI-DialogBox-Background",
+
+        edgeFile =
+            "Interface\\DialogFrame\\UI-DialogBox-Border",
+
         tile = true,
         tileSize = 32,
         edgeSize = 32,
+
         insets = {
             left = 8,
             right = 8,
@@ -48,81 +61,188 @@ function MainFrame:Create()
         },
     })
 
-    local title = frame:CreateFontString(
-        nil,
-        "OVERLAY",
-        "GameFontHighlightLarge"
+
+    -- ---------------------------------------------------
+    -- Title
+    -- ---------------------------------------------------
+
+    local title =
+        frame:CreateFontString(
+            nil,
+            "OVERLAY",
+            "GameFontHighlightLarge"
+        )
+
+    title:SetPoint(
+        "TOPLEFT",
+        20,
+        -18
     )
 
-    title:SetPoint("TOPLEFT", 20, -18)
-    title:SetText(ns.L.TITLE)
-
-    local subtitle = frame:CreateFontString(
-        nil,
-        "OVERLAY",
-        "GameFontNormal"
+    title:SetText(
+        ns.L.TITLE
     )
 
-    subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -5)
-    subtitle:SetText(ns.L.SUBTITLE)
 
-    local closeButton = CreateFrame(
-        "Button",
-        nil,
-        frame,
-        "UIPanelCloseButton"
+    local subtitle =
+        frame:CreateFontString(
+            nil,
+            "OVERLAY",
+            "GameFontNormal"
+        )
+
+    subtitle:SetPoint(
+        "TOPLEFT",
+        title,
+        "BOTTOMLEFT",
+        0,
+        -5
     )
 
-    closeButton:SetPoint("TOPRIGHT", -5, -5)
-
-    local enabled = CreateFrame(
-        "CheckButton",
-        nil,
-        frame,
-        "UICheckButtonTemplate"
+    subtitle:SetText(
+        ns.L.SUBTITLE
     )
 
-    enabled:SetPoint("TOPRIGHT", -55, -48)
 
-    enabled.text = enabled:CreateFontString(
-        nil,
-        "OVERLAY",
-        "GameFontNormal"
+    -- ---------------------------------------------------
+    -- Close
+    -- ---------------------------------------------------
+
+    local closeButton =
+        CreateFrame(
+            "Button",
+            nil,
+            frame,
+            "UIPanelCloseButton"
+        )
+
+    closeButton:SetPoint(
+        "TOPRIGHT",
+        -5,
+        -5
     )
 
-    enabled.text:SetPoint("RIGHT", enabled, "LEFT", -4, 0)
-    enabled.text:SetText(ns.L.ENABLED)
 
-    enabled:SetScript("OnClick", function(self)
-        ns.Database:SetEnabled(self:GetChecked())
-    end)
+    -- ---------------------------------------------------
+    -- Enabled
+    -- ---------------------------------------------------
 
-    frame:SetScript("OnShow", function()
-        enabled:SetChecked(ns.Database:IsEnabled())
+    local enabled =
+        CreateFrame(
+            "CheckButton",
+            nil,
+            frame,
+            "UICheckButtonTemplate"
+        )
 
-        if ns.UI.SpellList then
+    enabled:SetPoint(
+        "TOPRIGHT",
+        -55,
+        -48
+    )
+
+    enabled.text =
+        enabled:CreateFontString(
+            nil,
+            "OVERLAY",
+            "GameFontNormal"
+        )
+
+    enabled.text:SetPoint(
+        "RIGHT",
+        enabled,
+        "LEFT",
+        -4,
+        0
+    )
+
+    enabled.text:SetText(
+        ns.L.ENABLED
+    )
+
+    enabled:SetScript(
+        "OnClick",
+        function(self)
+            ns.Database:SetEnabled(
+                self:GetChecked()
+            )
+        end
+    )
+
+
+    -- ---------------------------------------------------
+    -- Content
+    -- ---------------------------------------------------
+
+    frame.content =
+        CreateFrame(
+            "Frame",
+            nil,
+            frame
+        )
+
+    frame.content:SetPoint(
+        "TOPLEFT",
+        20,
+        -80
+    )
+
+    frame.content:SetPoint(
+        "BOTTOMRIGHT",
+        -20,
+        60
+    )
+
+
+    -- ---------------------------------------------------
+    -- Add button
+    -- ---------------------------------------------------
+
+    local addButton =
+        CreateFrame(
+            "Button",
+            nil,
+            frame,
+            "UIPanelButtonTemplate"
+        )
+
+    addButton:SetSize(
+        140,
+        25
+    )
+
+    addButton:SetPoint(
+        "BOTTOMRIGHT",
+        -20,
+        20
+    )
+
+    addButton:SetText(
+        ns.L.ADD_SPELL
+    )
+
+    addButton:SetScript(
+        "OnClick",
+        function()
+            ns.UI.SpellEditor:Open()
+        end
+    )
+
+
+    -- ---------------------------------------------------
+    -- Show
+    -- ---------------------------------------------------
+
+    frame:SetScript(
+        "OnShow",
+        function()
+            enabled:SetChecked(
+                ns.Database:IsEnabled()
+            )
+
             ns.UI.SpellList:Refresh()
         end
-    end)
-
-    local addButton = CreateFrame(
-        "Button",
-        nil,
-        frame,
-        "UIPanelButtonTemplate"
     )
-
-    addButton:SetSize(140, 25)
-    addButton:SetPoint("BOTTOMRIGHT", -20, 20)
-    addButton:SetText(ns.L.ADD_SPELL)
-
-    addButton:SetScript("OnClick", function()
-        ns.UI.SpellEditor:Open()
-    end)
-
-    frame.content = CreateFrame("Frame", nil, frame)
-    frame.content:SetPoint("TOPLEFT", 20, -80)
-    frame.content:SetPoint("BOTTOMRIGHT", -20, 60)
 
     frame:Hide()
 
@@ -130,6 +250,7 @@ function MainFrame:Create()
 
     return frame
 end
+
 
 function MainFrame:Toggle()
     if not frame then
@@ -143,6 +264,8 @@ function MainFrame:Toggle()
     end
 end
 
+
 function MainFrame:GetContentFrame()
-    return frame and frame.content
+    return frame
+        and frame.content
 end

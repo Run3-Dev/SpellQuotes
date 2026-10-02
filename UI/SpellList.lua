@@ -7,76 +7,128 @@ local SpellList = ns.UI.SpellList
 
 local rows = {}
 
-local function GetSpellName(spellID)
-    if C_Spell and C_Spell.GetSpellInfo then
-        local info = C_Spell.GetSpellInfo(spellID)
 
-        if info then
-            return info.name
-        end
+-- -------------------------------------------------------
+-- Spell information
+-- -------------------------------------------------------
+
+local function GetSpellName(spellID)
+    if not C_Spell
+        or not C_Spell.GetSpellInfo
+    then
+        return nil
     end
 
-    return nil
+    local info =
+        C_Spell.GetSpellInfo(spellID)
+
+    if not info then
+        return nil
+    end
+
+    return info.name
 end
+
+
+-- -------------------------------------------------------
+-- Rows
+-- -------------------------------------------------------
 
 local function ClearRows()
     for _, row in ipairs(rows) do
         row:Hide()
+        row.spellID = nil
     end
 end
 
-local function CreateRow(parent, index)
-    local row = CreateFrame(
-        "Button",
-        nil,
-        parent,
-        "BackdropTemplate"
-    )
+
+local function CreateRow(
+    parent,
+    index
+)
+    local row =
+        CreateFrame(
+            "Button",
+            nil,
+            parent,
+            "BackdropTemplate"
+        )
 
     row:SetHeight(42)
 
     row:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8X8",
+        bgFile =
+            "Interface\\Buttons\\WHITE8X8",
     })
 
-    row:SetBackdropColor(0.08, 0.08, 0.08, 0.5)
-
-    row.name = row:CreateFontString(
-        nil,
-        "OVERLAY",
-        "GameFontNormal"
+    row:SetBackdropColor(
+        0.08,
+        0.08,
+        0.08,
+        0.5
     )
 
-    row.name:SetPoint("LEFT", 10, 7)
 
-    row.details = row:CreateFontString(
-        nil,
-        "OVERLAY",
-        "GameFontDisableSmall"
+    row.name =
+        row:CreateFontString(
+            nil,
+            "OVERLAY",
+            "GameFontNormal"
+        )
+
+    row.name:SetPoint(
+        "LEFT",
+        10,
+        7
     )
 
-    row.details:SetPoint("LEFT", 10, -9)
 
-    row:SetScript("OnClick", function(self)
-        if self.spellID then
-            ns.UI.SpellEditor:Open(self.spellID)
+    row.details =
+        row:CreateFontString(
+            nil,
+            "OVERLAY",
+            "GameFontDisableSmall"
+        )
+
+    row.details:SetPoint(
+        "LEFT",
+        10,
+        -9
+    )
+
+
+    row:SetScript(
+        "OnClick",
+        function(self)
+            if not self.spellID then
+                return
+            end
+
+            ns.UI.SpellEditor:Open(
+                self.spellID
+            )
         end
-    end)
+    )
 
     rows[index] = row
 
     return row
 end
 
+
+-- -------------------------------------------------------
+-- Initialization
+-- -------------------------------------------------------
+
 function SpellList:Initialize()
-    local parent = ns.UI.MainFrame:GetContentFrame()
-
-    if not parent then
-        return
-    end
-
-    self.parent = parent
+    self.parent =
+        ns.UI.MainFrame:GetContentFrame()
 end
+
+
+-- -------------------------------------------------------
+-- Refresh
+-- -------------------------------------------------------
 
 function SpellList:Refresh()
     if not self.parent then
@@ -85,42 +137,62 @@ function SpellList:Refresh()
 
     ClearRows()
 
-    local spells = ns.Database:GetSpells()
+    local spells =
+        ns.Database:GetSpells()
 
     local spellIDs = {}
 
     for spellID in pairs(spells) do
-        table.insert(spellIDs, spellID)
+        table.insert(
+            spellIDs,
+            spellID
+        )
     end
 
     table.sort(spellIDs)
 
+
+    -- No spells
     if #spellIDs == 0 then
         if not self.emptyText then
-            self.emptyText = self.parent:CreateFontString(
-                nil,
-                "OVERLAY",
-                "GameFontDisable"
-            )
+            self.emptyText =
+                self.parent:CreateFontString(
+                    nil,
+                    "OVERLAY",
+                    "GameFontDisable"
+                )
 
-            self.emptyText:SetPoint("CENTER")
+            self.emptyText:SetPoint(
+                "CENTER"
+            )
         end
 
-        self.emptyText:SetText(ns.L.NO_SPELLS)
+        self.emptyText:SetText(
+            ns.L.NO_SPELLS
+        )
+
         self.emptyText:Show()
 
         return
     end
 
+
     if self.emptyText then
         self.emptyText:Hide()
     end
 
+
+    -- Create/update rows
     for index, spellID in ipairs(spellIDs) do
-        local row = rows[index]
+        local row =
+            rows[index]
 
         if not row then
-            row = CreateRow(self.parent, index)
+            row =
+                CreateRow(
+                    self.parent,
+                    index
+                )
         end
 
         row:ClearAllPoints()
@@ -137,25 +209,36 @@ function SpellList:Refresh()
             -((index - 1) * 46)
         )
 
-        local data = spells[spellID]
+        local data =
+            spells[spellID]
 
-        local spellName = GetSpellName(spellID)
+        local spellName =
+            GetSpellName(spellID)
 
         if spellName then
             row.name:SetText(
-                spellName .. "  [" .. spellID .. "]"
+                spellName
+                .. "  ["
+                .. spellID
+                .. "]"
             )
         else
             row.name:SetText(
-                "Spell " .. spellID
+                ns.L.UNKNOWN_SPELL
+                .. " ["
+                .. spellID
+                .. "]"
             )
         end
 
         row.details:SetText(
             tostring(data.chance or 0)
             .. "% · "
-            .. tostring(#(data.quotes or {}))
-            .. " Quotes"
+            .. tostring(
+                #(data.quotes or {})
+            )
+            .. " "
+            .. ns.L.QUOTE_COUNT
         )
 
         row.spellID = spellID
