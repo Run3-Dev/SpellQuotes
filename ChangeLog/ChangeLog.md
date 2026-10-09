@@ -4,6 +4,16 @@ All notable changes to **SpellQuotes (by run3_)** will be documented in this fil
 
 ---
 
+## [0.3.1] - 2026-10-09
+
+### Fixed
+- Fixed the spell list becoming inaccessible when too many spells were configured.
+
+### Improved
+- Added a scrollable spell list with mouse wheel support.
+- Added a scrollbar for navigating large spell collections.
+- Improved dynamic list sizing.
+
 ## [0.3.0] - 2026-10-02
 
 ### Added
@@ -49,3 +59,4 @@ All notable changes to **SpellQuotes (by run3_)** will be documented in this fil
   - Tooltip handling
   - User interface
   - Localization
+

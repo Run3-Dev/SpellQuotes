@@ -1,4 +1,4 @@
-## Interface: 120100
+## Interface: 120105
 ## Title: SpellQuotes (by run3_)
 ## Notes: Random quotes triggered by your spells.
 ## Author: run3_
